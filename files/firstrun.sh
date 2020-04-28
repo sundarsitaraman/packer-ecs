@@ -39,29 +39,35 @@ log_stream_name={instance_id}
 [/var/log/messages]
 file=/var/log/messages
 log_group_name=${STACK_NAME}/ec2/${AUTOSCALING_GROUP}/var/log/messages
-log_stream_name=${instance_id}
+log_stream_name={instance_id}
 datetime_format=%Y-%m-%dT%H:%M:%S
 
 [/var/log/docker]
 file=/var/log/docker
 log_group_name=${STACK_NAME}/ec2/${AUTOSCALING_GROUP}/var/log/docker
-log_stream_name=${instance_id}
+log_stream_name={instance_id}
 datetime_format=%Y-%m-%dT%H:%M:%S.%f
 
 [/var/log/ecs/ecs-init.log]
 file=/var/log/ecs/ecs-init.log*
 log_group_name=${STACK_NAME}/ec2/${AUTOSCALING_GROUP}/var/log/ecs/ecs-init
-log_stream_name=${instance_id}
+log_stream_name={instance_id}
 datetime_format=%Y-%m-%dT%H:%M:%SZ
 time_zone=UTC
 
 [/var/log/ecs/ecs-agent.log]
 file=/var/log/ecs/ecs-agent.log*
 log_group_name=${STACK_NAME}/ec2/${AUTOSCALING_GROUP}/var/log/ecs/ecs-agent
-log_stream_name=${instance_id}
+log_stream_name={instance_id}
 datetime_format=%Y-%m-%dT%H:%M:%SZ
 time_zone=UTC
 EOF
+
+sudo service ecs stop
+
+sudo cp /usr/lib/systemd/system/ecs.service /etc/systemd/system/ecs.service
+sudo sed -i '/After=cloud-final.service/d' /etc/systemd/system/ecs.service
+sudo systemctl daemon-reload
 
 sudo service awslogsd start
 sudo chkconfig docker on
